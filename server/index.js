@@ -52,7 +52,6 @@ app.use((err, req, res, next) => {
 // ── Start ─────────────────────────────────────────────
 async function startServer() {
   try {
-    await connectDB();
     const server = app.listen(PORT, () => {
       console.log(`🚀 AccessCare API running at http://localhost:${PORT}`);
     });
@@ -67,6 +66,13 @@ async function startServer() {
   }
 }
 
+// Global DB connection for Vercel
+connectDB().catch(err => console.error('DB connect error:', err));
+
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  startServer();
+}
+
 process.on('unhandledRejection', (err) => {
   console.error('💥 Unhandled Rejection:', err.message);
 });
@@ -75,4 +81,4 @@ process.on('uncaughtException', (err) => {
   console.error('💥 Uncaught Exception:', err.message);
 });
 
-startServer();
+module.exports = app;
